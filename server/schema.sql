@@ -16,30 +16,14 @@ USE chat;
 -- User info
 -- ---
 
-DROP TABLE IF EXISTS `User`;
+DROP TABLE IF EXISTS `Users`;
     
-CREATE TABLE `User` (
+CREATE TABLE `Users` (
   `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
   `Name` VARCHAR(128) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) COMMENT 'User info';
 
--- ---
--- Table 'Messages'
--- 
--- ---
-
-DROP TABLE IF EXISTS `Messages`;
-    
-CREATE TABLE `Messages` (
-  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
-  `Messages` MEDIUMTEXT NULL DEFAULT NULL,
-  `id_User` INTEGER NULL DEFAULT NULL,
-  `id_Rooms` INTEGER NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`id_User`) REFERENCES `User` (`id`),
-  FOREIGN KEY (`id_Rooms`) REFERENCES `Rooms` (`id`)
-);
 
 -- ---
 -- Table 'Rooms'
@@ -67,6 +51,65 @@ CREATE TABLE `Friends` (
   FOREIGN KEY (`User`) REFERENCES `User` (`id`),
   FOREIGN KEY (`UserFriend`) REFERENCES `User` (`id`)
 );
+
+
+-- ---
+-- Table 'Messages'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `Messages`;
+    
+CREATE TABLE `Messages` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `Message` MEDIUMTEXT NULL DEFAULT NULL,
+  `id_Users` INTEGER NULL DEFAULT NULL,
+  `id_Rooms` INTEGER NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`id_Users`) REFERENCES `Users` (`id`),
+  FOREIGN KEY (`id_Rooms`) REFERENCES `Rooms` (`id`)
+);
+
+
+
+-- --
+-- Inserting Dummy Data
+-- --
+
+INSERT into `USERS` (`Name`)
+  VALUES
+    ('John Doe'),
+    ('Jane Doe'),
+    ('Foo'),
+    ('Bar');
+
+
+INSERT INTO `ROOMS` (`Name`)
+  VALUES
+    ('Lobby'),
+    ('Test'),
+    ('Kitchen');
+
+
+INSERT into `MESSAGES` (`Message`, `id_Users`, `id_Rooms`)
+  VALUES
+    ('This is a message', 1, 1),
+    ('This is another', 2, 2),
+    ('This is a different message', 3, 3);
+
+-- --
+-- Select Data Testing
+-- --
+
+SELECT Users.Name, Message, Rooms.Name
+  FROM Users, Messages, Rooms
+  WHERE id_Rooms = Rooms.id 
+    and id_Users = Users.id;
+
+SELECT Message, Rooms.Name
+  FROM Messages, Rooms
+  WHERE id_Rooms = Rooms.id;
+  -- WHERE id_User = User.id;
 
 -- ---
 -- Foreign Keys 
