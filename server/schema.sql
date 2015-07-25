@@ -15,13 +15,15 @@ USE chat;
 -- Table 'User'
 -- User info
 -- ---
+DROP TABLE Users, Friends, Messages;
+
 
 DROP TABLE IF EXISTS `Users`;
     
 CREATE TABLE `Users` (
-  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  -- `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
   `username` VARCHAR(128) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`username`)
 ) COMMENT 'User info';
 
 
@@ -46,10 +48,10 @@ CREATE TABLE `Users` (
 DROP TABLE IF EXISTS `Friends`;
     
 CREATE TABLE `Friends` (
-  `User` INT NULL DEFAULT NULL,
-  `UserFriend` INTEGER NULL DEFAULT NULL,
-  FOREIGN KEY (`User`) REFERENCES `Users` (`id`),
-  FOREIGN KEY (`UserFriend`) REFERENCES `Users` (`id`)
+  `User` VARCHAR(128)  NULL DEFAULT NULL,
+  `UserFriend` VARCHAR(128)  NULL DEFAULT NULL
+  -- FOREIGN KEY (`User`) REFERENCES `Users` (`username`),
+  -- FOREIGN KEY (`UserFriend`) REFERENCES `Users` (`username`)
 );
 
 
@@ -61,25 +63,32 @@ CREATE TABLE `Friends` (
 DROP TABLE IF EXISTS `Messages`;
     
 CREATE TABLE `Messages` (
-  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  -- `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
   `message` MEDIUMTEXT NULL DEFAULT NULL,
   `roomname` VARCHAR(64) NULL DEFAULT 'Lobby',
-  `id_Users` INTEGER NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`id_Users`) REFERENCES `Users` (`id`)
+  `username` VARCHAR(128)  NULL DEFAULT NULL
+  -- PRIMARY KEY (`id`)
+  -- FOREIGN KEY (`username`) REFERENCES `Users` (`username`)
   -- FOREIGN KEY (`id_Rooms`) REFERENCES `Rooms` (`id`)
 );
 
+--Add Foreign Keys
+-- ALTER TABLE `Messages` ADD FOREIGN KEY (id_User) REFERENCES `User` (`id`);
+ALTER TABLE `Messages` ADD FOREIGN KEY(username) REFERENCES `User` (`username`);
+ALTER TABLE `Friends` ADD FOREIGN KEY(User) REFERENCES `User` (`username`);
+ALTER TABLE `Friends` ADD FOREIGN KEY(UserFriend) REFERENCES `User` (`username`);
 
 
 -- --
 -- Inserting Dummy Data
 -- --
 
-INSERT into `USERS` (`username`)
+INSERT IGNORE into `USERS` (`username`)
   VALUES
     ('John Doe'),
     ('Jane Doe'),
+    ('John Doe'),
+    ('Foo'),
     ('Foo'),
     ('Bar');
 
@@ -91,11 +100,17 @@ INSERT into `USERS` (`username`)
 --     ('Kitchen');
 
 
+
 INSERT into `MESSAGES` (`message`, `id_Users`)
   VALUES
     ('This is a message', 11),
     ('This is another', 12),
     ('This is a different message', 13);
+
+INSERT into `MESSAGES` (`message`, `id_users`)
+  SELECT "BODY OF MESSAGE", Users.id
+  FROM Users
+  WHERE Users.username = "inputted username"
 
 INSERT into `MESSAGES` (`message`, `id_Users`)
   SELECT 'This is a test message', Users.id

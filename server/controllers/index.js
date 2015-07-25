@@ -10,10 +10,11 @@ var db = require('../db');
 module.exports = {
   messages: {
     get: function (req, res) {
-      var data = db.connection.query('SELECT Users.username, Messages.message, Messages.roomname FROM Users, Messages WHERE id_Users = Users.id;');
-      console.log("Get Data ------===========>" + JSON.stringify(data));
-      res.writeHead(statusCode, headers);
-      res.end(JSON.stringify(data));
+      db.connection.query('SELECT Users.username, Messages.message, Messages.roomname FROM Users, Messages WHERE id_Users = Users.id;', function(err, message){
+        console.log("Get Data ------===========>" + JSON.stringify(message));
+        res.writeHead(200, headers);
+        res.end(JSON.stringify(message));
+      });
     }, // a function which handles a get request for all messages
     post: function (req, res) {
 
@@ -21,8 +22,21 @@ module.exports = {
       console.log("-------------------> on message POST req.body" + req.body);
       // var key = db.connection.query('SELECT name ')
       // console.log('INSERT into `MESSAGES` (`message`, `id_users`) SELECT \'' + req.body.message  + '\', USERS.id FROM Users WHERE Users.username = \'' + req.body.username + '\';');
-      db.connection.query('INSERT into `MESSAGES` (`message`, `id_users`) SELECT \'' + req.body.message  + '\', Users.id FROM Users WHERE Users.username = \'' + req.body.username + '\';');
-      res.end();
+      db.connection.query('INSERT IGNORE INTO Users SET ?', req.body, function(err, result) {
+        if(err) {
+          console.log(err);
+        } else {
+          console.log('post success');
+        }
+      });
+      db.connection.query('INSERT into `MESSAGES` SET ?', req.body,function(err, result) {
+        if(err) {
+          console.log(err);
+        } else {
+          console.log('post success');
+          res.end();
+        }
+      });
         //Check if user does not exists in user table
           //Add user to user table
         //Submit message object to database;
@@ -49,12 +63,17 @@ module.exports = {
     post: function (req, res) {
 
       console.log("-------------------> POST on USER req.body" + req.body.username);
-      db.connection.query('INSERT INTO Users SET ?', req.body, function(err, result) {
-        //
+      console.log(req.body.id);
+      // db.connection.query('INSERT IGNORE INTO `USERS` (`username`) VALUES (\'' + req.body.username + '\');');
+      db.connection.query('INSERT IGNORE INTO Users SET ?', req.body, function(err, result) {
+        if(err) {
+          console.log(err);
+        } else {
+          console.log('post success');
+          console.log(result);
+          res.end();
+        }
       });
-      res.end();
-      //TODO: Check if user does not exist in user table
-        //aAdd user to user table
     }
   }
 };

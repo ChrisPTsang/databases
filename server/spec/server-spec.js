@@ -21,8 +21,7 @@ describe("Persistent Node Chat Server", function() {
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
     dbConnection.query("truncate " + tablename, done);
-    dbConnection.query("DELETE FROM MESSAGES WHERE ID>-1");
-    dbConnection.query("DELETE FROM USERS WHERE ID>-1");
+
   });
 
   afterEach(function() {
@@ -40,7 +39,7 @@ describe("Persistent Node Chat Server", function() {
               uri: "http://127.0.0.1:3000/classes/messages",
               json: {
                 username: "Valjean",
-                message: "In mercys name, three days is all I need.",
+                message: "In mercy's name, three days is all I need.",
                 roomname: "Hello"
               }
       }, function () {
@@ -57,7 +56,7 @@ describe("Persistent Node Chat Server", function() {
           expect(results.length).to.equal(1);
 
           // TODO: If you don't have a column named text, change this test.
-          expect(results[0].message).to.equal("In mercys name, three days is all I need.");
+          expect(results[0].message).to.equal("In mercy's name, three days is all I need.");
 
           done();
         });
@@ -67,12 +66,13 @@ describe("Persistent Node Chat Server", function() {
 
   it("Should output all messages from the DB", function(done) {
     // Let's insert a message into the db
-       var queryString = "SELECT message, roomname FROM Messages";
-       var queryArgs = [];
+       var queryString = 'INSERT into `MESSAGES` SET ?';
+       var queryArgs = [{username: "PatChris", message: "Men like you can never change!", roomname: "main" }];
     // TODO - The exact query string and query args to use
     // here depend on the schema you design, so I'll leave
     // them up to you. */
 
+    dbConnection.query('INSERT IGNORE INTO Users SET ?', queryArgs[0]);
     dbConnection.query(queryString, queryArgs, function(err) {
       if (err) { throw err; }
 
