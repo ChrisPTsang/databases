@@ -63,11 +63,11 @@ CREATE TABLE `Friends` (
 DROP TABLE IF EXISTS `Messages`;
     
 CREATE TABLE `Messages` (
-  -- `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `objectId` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
   `message` MEDIUMTEXT NULL DEFAULT NULL,
   `roomname` VARCHAR(64) NULL DEFAULT 'Lobby',
-  `username` VARCHAR(128)  NULL DEFAULT NULL
-  -- PRIMARY KEY (`id`)
+  `username` VARCHAR(128)  NULL DEFAULT NULL,
+  PRIMARY KEY (`objectId`)
   -- FOREIGN KEY (`username`) REFERENCES `Users` (`username`)
   -- FOREIGN KEY (`id_Rooms`) REFERENCES `Rooms` (`id`)
 );

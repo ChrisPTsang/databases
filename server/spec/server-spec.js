@@ -72,14 +72,15 @@ describe("Persistent Node Chat Server", function() {
     // here depend on the schema you design, so I'll leave
     // them up to you. */
 
-    dbConnection.query('INSERT IGNORE INTO Users SET ?', queryArgs[0]);
-    dbConnection.query(queryString, queryArgs, function(err) {
-      if (err) { throw err; }
+    // console.log("CHECKING USERNAME ---------->" + queryArgs[0].username);
+    // dbConnection.query('INSERT IGNORE INTO Users SET ?', queryArgs);
+    dbConnection.query(queryString, queryArgs, function(err, result) {
+      if (err) { 
+        throw err; }
 
       // Now query the Node chat server and see if it returns
       // the message we just inserted:
       request("http://127.0.0.1:3000/classes/messages", function(error, response, body) {
-        console.log("PARSING BODY-------------->" + body);
         var messageLog = JSON.parse(body);
         expect(messageLog[0].message).to.equal("Men like you can never change!");
         expect(messageLog[0].roomname).to.equal("main");
