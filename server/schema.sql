@@ -20,7 +20,7 @@ DROP TABLE IF EXISTS `Users`;
     
 CREATE TABLE `Users` (
   `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
-  `Name` VARCHAR(128) NULL DEFAULT NULL,
+  `username` VARCHAR(128) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) COMMENT 'User info';
 
@@ -30,13 +30,13 @@ CREATE TABLE `Users` (
 -- 
 -- ---
 
-DROP TABLE IF EXISTS `Rooms`;
+-- DROP TABLE IF EXISTS `Rooms`;
     
-CREATE TABLE `Rooms` (
-  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
-  `Name` VARCHAR(64) NULL DEFAULT 'Lobby',
-  PRIMARY KEY (`id`)
-);
+-- CREATE TABLE `Rooms` (
+--   `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+--   `roomname` VARCHAR(64) NULL DEFAULT 'Lobby',
+--   PRIMARY KEY (`id`)
+-- );
 
 -- ---
 -- Table 'Friends'
@@ -48,8 +48,8 @@ DROP TABLE IF EXISTS `Friends`;
 CREATE TABLE `Friends` (
   `User` INT NULL DEFAULT NULL,
   `UserFriend` INTEGER NULL DEFAULT NULL,
-  FOREIGN KEY (`User`) REFERENCES `User` (`id`),
-  FOREIGN KEY (`UserFriend`) REFERENCES `User` (`id`)
+  FOREIGN KEY (`User`) REFERENCES `Users` (`id`),
+  FOREIGN KEY (`UserFriend`) REFERENCES `Users` (`id`)
 );
 
 
@@ -62,12 +62,12 @@ DROP TABLE IF EXISTS `Messages`;
     
 CREATE TABLE `Messages` (
   `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
-  `Message` MEDIUMTEXT NULL DEFAULT NULL,
+  `message` MEDIUMTEXT NULL DEFAULT NULL,
+  `roomname` VARCHAR(64) NULL DEFAULT 'Lobby',
   `id_Users` INTEGER NULL DEFAULT NULL,
-  `id_Rooms` INTEGER NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`id_Users`) REFERENCES `Users` (`id`),
-  FOREIGN KEY (`id_Rooms`) REFERENCES `Rooms` (`id`)
+  FOREIGN KEY (`id_Users`) REFERENCES `Users` (`id`)
+  -- FOREIGN KEY (`id_Rooms`) REFERENCES `Rooms` (`id`)
 );
 
 
@@ -76,7 +76,7 @@ CREATE TABLE `Messages` (
 -- Inserting Dummy Data
 -- --
 
-INSERT into `USERS` (`Name`)
+INSERT into `USERS` (`username`)
   VALUES
     ('John Doe'),
     ('Jane Doe'),
@@ -84,24 +84,32 @@ INSERT into `USERS` (`Name`)
     ('Bar');
 
 
-INSERT INTO `ROOMS` (`Name`)
+-- INSERT INTO `ROOMS` (`roomname`)
+--   VALUES
+--     ('Lobby'),
+--     ('Test'),
+--     ('Kitchen');
+
+
+INSERT into `MESSAGES` (`message`, `id_Users`)
   VALUES
-    ('Lobby'),
-    ('Test'),
-    ('Kitchen');
+    ('This is a message', 11),
+    ('This is another', 12),
+    ('This is a different message', 13);
 
-
-INSERT into `MESSAGES` (`Message`, `id_Users`, `id_Rooms`)
-  VALUES
-    ('This is a message', 1, 1),
-    ('This is another', 2, 2),
-    ('This is a different message', 3, 3);
-
+INSERT into `MESSAGES` (`message`, `id_Users`)
+  SELECT 'This is a test message', Users.id
+  FROM Users
+  WHERE Users.username = 'Valjean';
 -- --
 -- Select Data Testing
 -- --
 
-SELECT Users.Name, Message, Rooms.Name
+SELECT Users.username, Messages.message, Messages.roomname
+  FROM Users, Messages
+  WHERE id_Users = Users.id;
+
+SELECT Users.username, Message, Rooms.roomname
   FROM Users, Messages, Rooms
   WHERE id_Rooms = Rooms.id 
     and id_Users = Users.id;
